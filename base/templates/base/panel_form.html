@@ -1,0 +1,110 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+    {% if page == 'update' %}
+    <h3>
+        <a href="{% url 'panel-show' request.user.id %}">Back</a>
+        Update {{panel.name}}
+    </h3>
+    {% else %}
+    <h3>
+        <a href="{% url 'panel-show' request.user.id %}">Back</a>
+        Create Panel Room
+    </h3>
+    {% endif %}
+    
+    <form class="form" action="" method="POST" >
+        {% csrf_token %}
+
+        {% if page == 'update' %}
+        <div class="form__group">
+            <label for="panel_name">Enter Panel Name</label>
+            {{form.name}}
+        </div>
+        
+        {% else %}
+            <div class="form__group">
+                <label for="panel_name">Enter Panel Name</label>
+                <input required type="text" name="panel_name" list="panel-list" />
+                <datalist id="panel-list">
+                    <select id="panel_name">
+                        
+                        {% for panel in panels %}
+                        <option value="{{panel}}">{{panel}}</option>
+                        {% endfor %}
+                        
+                    </select>
+                </datalist>
+            </div>
+        {% endif %}
+        
+
+        {% if page == 'update' %}
+        <div class="form__group">
+            <label for="panel_member_list">Add Panel members</label>
+            <a href="{% url 'add-members' panel.id %}">Add</a>
+            <ul>
+                {% for member in members %}
+                    <li>
+                        {{member}} 
+                        <a href="/update-member/{{panel.host}}/{{member.id}}/"> <small> Update</small></a>
+                        <a href="/delete-member/{{panel.host}}/{{member.id}}/"> <small> Delete</small></a>
+                    </li>
+                {% endfor %}
+            </ul>   
+        </div>
+        {% else %}
+        <div class="form__group">
+            <label for="panel_member_list">Add Panel members: </label>
+            <input required type="text" name="panel_member" list="panel-member-list" />
+            <datalist id="panel-member-list">
+                <select id="panel_member">
+                    
+                    {% for member in members %}
+                    <option value="{{member}}">{{member}}</option>
+                    {% endfor %}
+                    
+                </select>
+            </datalist>
+        </div>
+        {% endif %}
+        
+        {% if page == 'update' %}
+        <div class="form__group">
+            <label for="panel_time_list">Interview Slots: </label>
+            <a href="{% url 'add-slots' panel.id %}">Add</a>
+            <ul>
+                {% for slot in slots %}
+                    <li>
+                        {{slot}} 
+                        <a href="{% url 'update-slot' slot.id %}"> <small> Update</small></a>
+                        <a href="{% url 'delete-slot' slot.id %}"> <small> Delete</small></a>
+                    </li>
+                {% endfor %} 
+            </ul>    
+        </div>
+        {% else %}
+        <div class="form__group">
+            <label for="panel_time_list">Set Interview Time</label>
+            <br />
+            {{form.set_time}}          
+        </div>
+        {% endif %}
+        
+
+        {% if page == 'update' %}
+        <div class="form__action">
+            <a href="{% url 'panel-show' request.user.id %}">Cancel</a>
+            <button class="btn" type="submit">Update</button>
+        </div>
+        {% else %}
+        <div class="form__action">
+            <a href="{% url 'panel-show' request.user.id %}">Cancel</a>
+            <button class="btn" type="submit">Create</button>
+        </div>
+        {% endif %}
+        
+    </form>
+
+{% endblock content %}

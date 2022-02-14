@@ -1,0 +1,12 @@
+{% extends 'base/main.html' %}
+{% block content %}
+
+<a href="{% url 'panel-show' request.user.id %}">Back</a>
+<h1>{{user}}</h1>
+    <p>{{user.member_name}}</p>
+    <p>{{user.email}}</p>
+    <p>{{user.phone}}</p>
+    <p>{{user.branch}}</p>
+    <p>{{user.slot_booked.date}}--->{{user.slot_booked.time}}</p>
+
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends 'base/main.html' %}
+{% block content %}
+<form method="POST" action="">
+    {% csrf_token %}
+    
+    <div class="form__group">
+        <label for="slot_time_list">Choose Interview Time: </label>
+
+        <input required type="text" name="date_1" list="slot_time-list" />
+        <datalist id="slot_time-list">
+            <select id="slot_time">
+                {% for member in panel %}
+                    {% for item in member.set_time.all %}
+                    <option value="{{item.time}}">{{item.time}}</option>
+                    {% endfor %}
+                {% endfor %}
+                
+            </select>
+        </datalist>
+        <button value="Submit" type="submit">Submit</button>
+    </div>
+</form>
+{% endblock %}

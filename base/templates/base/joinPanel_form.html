@@ -1,0 +1,28 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+
+<a href="{% url 'student-home' %}">Back</a>
+<h1>Schedule your interview {{participant.name}}</h1>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        <div class="form__group">
+            <label for="slot_list">Choose Interview Date: </label>
+            <input required type="text" name="date_0" list="slot-list" />
+            <datalist id="slot-list">
+                <select id="slot">
+                    
+                    {% for item in slots_for_id %}
+                    <option value="{{item.id}}">{{item.date.day}}->{{item.time}}</option>
+                    {% endfor %}
+                    
+                </select>
+            </datalist>
+        </div>
+    
+        <button type="submit" value="Submit">Submit</button>
+    </form>
+
+{% endblock content %}

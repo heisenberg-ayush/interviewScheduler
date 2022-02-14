@@ -1,0 +1,59 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+<style>
+    .panel-container{
+        display: grid;
+        grid-template-columns: 3fr 3fr 1fr;
+    }
+</style>
+<a href="{% url 'panel-home' %}">Back</a>
+<h1>Panels</h1>
+<h3>The panels your are hosting:</h3>
+
+{% for panel in panels %}
+    <div>
+        <h3>
+            {{panel.name}}
+            <a href="{% url 'update-panel' panel.id %}"><small>Update</small></a>
+            <a href="{% url 'delete-panel' panel.id %}"><small>Delete</small></a>
+        </h3>
+    </div>
+    
+    
+    <div class="panel-container">
+        <div>
+            <h5>Members: </h5>
+            {% for s in panel.panel_members.all %}
+                <p>
+                    <a href="{% url 'member-detail' s.id %}">{{s.member_name}} </a>
+                    <a href="/update-member/{{panel.host}}/{{s.id}}/"> <small> Update</small></a>
+                    <a href="/delete-member/{{panel.host}}/{{s.id}}/"> <small> Delete</small></a>
+            {% endfor %}
+            <a href="{% url 'add-members' panel.id %}">+Add Members</a>
+            
+        </div>
+        <div>
+            <h5>Participants: </h5>
+            {% for s in panel.participants.all %}
+                <p><a href="{% url 'participant-detail' s.id %}">{{s.member_name}} </a></p>
+            {% endfor %}
+        </div>
+        <div>
+            <h5>Slots: </h5>
+            {% for sl in panel.set_time.all %}
+            <p>
+                {{sl.date}}::<small>{{sl.time}}</small>
+                <a href="{% url 'update-slot' sl.id %}"> <small> Update</small></a>
+                <a href="{% url 'delete-slot' sl.id %}"> <small> Delete</small></a>
+            </p>
+            {% endfor %}
+            <a href="{% url 'add-slots' panel.id %}">+Add Slots</a>
+        </div>
+    </div>
+    <hr />
+{% endfor %}
+<a href="{% url 'create-panel' request.user.id %}">+Create Panel</a>
+    
+
+{% endblock content %}

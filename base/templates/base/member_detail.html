@@ -1,0 +1,14 @@
+{% extends 'base/main.html' %}
+{% block content %}
+
+<a href="{% url 'panel-show' request.user.id %}">Back</a>
+<h1>
+    {{user}}
+    <a href="{% url 'update-member' request.user user.id %}"><small>Update</small></a>
+    <a href="{% url 'delete-member' request.user  user.id %}"><small>Delete</small></a>
+</h1>
+    <p>{{user.member_name}}</p>
+    <p>{{user.email}}</p>
+    <p>{{user.phone}}</p>
+    <p>{{user.branch}}</p>
+{% endblock content %}

@@ -1,0 +1,17 @@
+{% extends 'base/main.html' %}
+{% block content %}
+
+{% if request.user.is_teacher %}
+    <h1>Panel: {{request.user}}</h1>
+    <a href="{% url 'logout' %}">Logout</a>
+    <hr />
+
+    <a href="{% url 'create-panel' request.user.id %}">+Create Panel</a>
+    <hr />
+    <a href="{% url 'panel-show' request.user.id %}">Panels</a>
+    <hr />
+{% else %}
+<h1>Error</h1>
+{% endif %}
+
+{% endblock content %}

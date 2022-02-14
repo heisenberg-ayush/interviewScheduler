@@ -1,0 +1,26 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+{% if page == 'update' %}
+<a href="{% url 'student-home' %}">Back</a>
+<h1>Update Profile</h1>
+{% else %}
+<h1>Welcome {{participant}}</h1>
+{% endif %}
+
+
+<form method="POST" action="">
+    {% csrf_token %}
+    
+    {{form.as_p}}
+
+    {% if page == 'update' %}
+    <a href="{% url 'student-home' %}">Cancel</a>
+    <input type="submit" value="Update" />
+    {% else %}
+    <input type="submit" value="Submit" />
+    {% endif %}
+    
+</form>
+{% endblock content %}

@@ -1,0 +1,41 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+{% if page == 'update' %}
+<a href="{% url 'panel-show' request.user.id %}">Back</a>
+<h1>Interview Slot: {{i_slot.slot}}</h1>
+{% else %}
+<a href="{% url 'panel-show' request.user.id %}">Back</a>
+<h1>Add Interview Slot to {{panel.name}}</h1>
+{% endif %}
+
+
+<form method="POST" action="">
+    {% csrf_token %}
+    
+    {% if page == 'update' %}
+        <div class="form__group">
+            <label for="panel_time_list">Set Interview Time</label>
+            <br />
+            {{form.as_p}}          
+        </div>
+    {% else %}
+        <div class="form__group">
+                <label for="panel_time_list">Set Interview Time</label>
+                <br />
+                {{form.as_p}}          
+        </div>
+    {% endif %}
+    
+
+    {% if page == 'update' %}
+        <a href="{% url 'panel-show' request.user.id %}">Cancel</a>
+        <input type="submit" value="Update" />
+    {% else %}
+        <a href="{% url 'panel-show' request.user.id %}">Cancel</a>
+        <input type="submit" value="Add" />
+    {% endif %}
+    
+</form>
+{% endblock content %}

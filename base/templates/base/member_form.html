@@ -1,0 +1,32 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+{% if page == 'update' %}
+<a href="{% url 'member-detail' user.id %}">Back</a>
+<h1>Update {{user.member_name}}</h1>
+{% else %}
+<a href="{% url 'panel-show' request.user.id %}">Back</a>
+<h1>Add members to {{panel.name}}</h1>
+{% endif %}
+
+
+<form method="POST" action="">
+    {% csrf_token %}
+
+    <div class="form__group">
+        <label for="member_name">Name</label>
+        <input required type="text" name="member_name" value="{{user.member_name}}" />
+    </div>
+    {{form.as_p}}
+
+    {% if page == 'update' %}
+    <a href="{% url 'member-detail' user.id %}">Cancel</a>
+    <input type="submit" value="Update" />
+    {% else %}
+    <a href="{% url 'panel-show' request.user.id %}">Cancel</a>
+    <input type="submit" value="Add" />
+    {% endif %}
+    
+</form>
+{% endblock content %}
