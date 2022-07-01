@@ -7,7 +7,8 @@ from users.models import User
 class InterviewSlot(models.Model):
     date = models.DateField(auto_now=False, auto_now_add=False, null=True)
     time = models.TimeField(auto_now=False, auto_now_add=False, null=True)
-    slot = models.SlugField() 
+    slot = models.SlugField()
+    booked = models.BooleanField(default=False)
     
     def __str__(self):
         return self.slot

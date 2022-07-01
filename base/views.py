@@ -1,5 +1,5 @@
-from datetime import datetime
-from django.http import HttpResponse
+# from datetime import datetime
+# from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 from .forms import MyUserCreationForm, RoomForm, PanelForm, SlotForm, StudentForm
 from users.models import User
 from .models import PanelRoom, PanelMember, InterviewSlot, ParticipantDetail
+
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Create your views here.
 
@@ -425,7 +428,7 @@ def studentDetail(request, pk):
                     phone = request.POST.get('phone'),
                     branch = request.POST.get('branch'),
                 )
-                return redirect('student-home')
+                return redirect('join-panel', user.id)
     else:
         return redirect('panel-home')
     
@@ -481,18 +484,51 @@ def joinPanel(request, pk):
         if request.method == 'POST':
             sk = InterviewSlot.objects.get(id=request.POST.get('date_0'))
 
+            # Setting the value to True so that
+            # this slot cannot be booked again
+            sk.booked = True
+            sk.save()
+            
+            # Remove the participant from other Panels
+            remPanels = PanelRoom.objects.filter(participants__member_name=participant.member_name) 
+            if remPanels.exists():
+                remPanels[0].participants.remove(participant)
+            
+            # Add participant in that Panel
             panel = sk.panelroom_set.all()
             panel[0].participants.add(participant)
-
             participant.slot_booked = sk
             participant.save()
-            return redirect('student-home')
+            
+            # send an email
+            nm = str(participant.member_name)
+            send_mail(
+                'ISTE Interview Scheduled', # subject
+                'Interview scheduled for ' + nm + ' at ' + str(sk), # message
+                settings.EMAIL_HOST_USER, # from email
+                [participant.email], # to email
+            )
+            
+            return redirect('sendEmail', user.id)
 
     else:
         return redirect('panel-home')
     
     context = {'participant':participant, 'form': form, 'slots': slots, 'slots_for_id': slots_for_id}
     return render(request, 'base/joinPanel_form.html', context)
+
+@login_required(login_url='login')
+def sendEmail(request, pk):
+    if request.user.is_student:
+        user = User.objects.get(id=pk)
+        if request.user != user:
+            return redirect('student-home')
+        
+    else:
+        return redirect('panel-home')
+    
+    context = {}
+    return render(request, 'base/sendEmail.html', context)
 
 # @login_required(login_url='login')
 # def bookSlot(request, date, pk):

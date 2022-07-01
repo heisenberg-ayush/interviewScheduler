@@ -4,7 +4,6 @@
 {% if request.user.is_student %}
     <h1>Student: {{request.user}}</h1>
     <a href="{% url 'student-update' request.user.id %}">Update Profile</a>
-    <a href="{% url 'join-panel' request.user.id %}">Join Panel</a>
     <a href="{% url 'logout' %}">Logout</a>
     <hr />
 {% else %}

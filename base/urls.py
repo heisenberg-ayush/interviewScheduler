@@ -28,5 +28,5 @@ urlpatterns = [
     path('student-detail/<str:pk>/', views.studentDetail, name='student-detail'),
     path('student-update/<str:pk>/', views.studentUpdate, name='student-update'),
     path('join-panel/<str:pk>/', views.joinPanel, name='join-panel'),
-    # path('book-slot/<str:date>/<str:pk>/', views.bookSlot, name='book-slot'),
+    path('send-email/<str:pk>/', views.sendEmail, name='sendEmail'),
 ]

@@ -40,4 +40,4 @@ class StudentForm(ModelForm):
     class Meta:
         model = ParticipantDetail
         fields = '__all__'
-        exclude = ['member_name']
+        exclude = ['member_name', 'slot_booked']

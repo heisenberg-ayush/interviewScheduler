@@ -4,7 +4,7 @@
 
 
 <a href="{% url 'student-home' %}">Back</a>
-<h1>Schedule your interview {{participant.name}}</h1>
+<h1>Schedule your interview: {{participant}}</h1>
 
     <form method="POST" action="">
         {% csrf_token %}
@@ -15,7 +15,11 @@
                 <select id="slot">
                     
                     {% for item in slots_for_id %}
-                    <option value="{{item.id}}">{{item.date.day}}->{{item.time}}</option>
+                    {% comment %} Checking if the slot is empty {% endcomment %}
+                    {% if item.booked == False %}
+                    <option value="{{item.id}}">{{item.date.year}}/{{item.date.month}}/{{item.date.day}}->{{item.time}}</option>
+                    {% endif %}
+                    
                     {% endfor %}
                     
                 </select>
