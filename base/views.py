@@ -115,13 +115,17 @@ def createPanel(request, pk):
             #Creating Panel Room (without member n slots)
             name = request.POST.get('panel_name')+ str(request.user)
             # check if already exists
-            nam1 = PanelMember.objects.get(panel_name=name)
+            if PanelRoom.objects.filter(name=name):
+                nam1 = PanelRoom.objects.get(name=name)
+            else:
+                nam1=''
             i=1
-            if nam1:
+            if nam1 != '':
                 PanelRoom.objects.create(
                     host=request.user,
                     name=name+str(i),
                 )
+                name= name+str(i)
             else:
                 PanelRoom.objects.create(
                     host=request.user,
@@ -132,7 +136,7 @@ def createPanel(request, pk):
             #Creating Interview Slot
             date_instance = request.POST.get('set_time_0')
             time_instance = request.POST.get('set_time_1')
-            name_instance = request.POST.get('panel_name')
+            name_instance = name
             i = " :: "
             slot_name = name_instance + i + time_instance + i + date_instance
             
@@ -196,16 +200,6 @@ def updatePanel(request, pk):
         form = RoomForm(instance=panel)
         members = panel.panel_members.all()
         slots = panel.set_time.all()
-        
-        if request.method == 'POST':
-            panel.name = request.POST.get('name')
-            
-            #Changing Interview Slot Slug name
-            slot = str(panel.name) + " " + i + prev_slot_name[1] + i + prev_slot_name[2]
-            InterviewSlot.objects.filter(slot__contains=name[0]).update(slot=slot)
-            
-            panel.save()
-            return redirect('panel-show', request.user.id)
 
     else:
         return redirect('student-home')
