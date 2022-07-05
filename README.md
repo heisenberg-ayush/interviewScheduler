@@ -1,5 +1,5 @@
 # interviewScheduler
-Using django as backend, created this interview Scheduler.
+Using django as backend, created this interview Scheduler. (ISTE Manipal club - internal purpose)
 ---
 So there are basically two types of user: 
 - admin (who can create different panels and its slots for interview purpose)
