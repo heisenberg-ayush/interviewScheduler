@@ -26,6 +26,7 @@
     {% else %}
     <a href="{% url 'panel-show' request.user.id %}">Cancel</a>
     <input type="submit" value="Add" />
+    <button><a href="{% url 'add-existing-members' panel.id %}">Add existing member</a></button>
     {% endif %}
     
 </form>

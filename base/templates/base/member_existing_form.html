@@ -1,0 +1,26 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+<a href="{% url 'panel-show' request.user.id %}">Back</a>
+<h1>Add members to {{panel.name}}</h1>
+
+
+<form method="POST" action="">
+    {% csrf_token %}
+        <div class="form__group">
+            <label for="member_name1">Name</label>
+            <input required list="membs" name="member_name1" id="memb" />
+            
+            <datalist id="membs">
+                {% for m in members %}
+                    <option value="{{m}}" >
+                {% endfor %}
+            </datalist>
+        </div>
+
+    <a href="{% url 'panel-show' request.user.id %}">Cancel</a>
+    <input type="submit" value="Add" />
+      
+</form>
+{% endblock content %}

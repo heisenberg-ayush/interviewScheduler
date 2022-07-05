@@ -5,7 +5,7 @@
     {% if page == 'update' %}
     <h3>
         <a href="{% url 'panel-show' request.user.id %}">Back</a>
-        Update {{panel.name}}
+        Update Panel Room
     </h3>
     {% else %}
     <h3>
@@ -18,24 +18,12 @@
         {% csrf_token %}
 
         {% if page == 'update' %}
-        <div class="form__group">
-            <label for="panel_name">Enter Panel Name</label>
-            {{form.name}}
-        </div>
+        <h5>Panel Name: {{panel.name}}</h5>
         
         {% else %}
             <div class="form__group">
                 <label for="panel_name">Enter Panel Name</label>
-                <input required type="text" name="panel_name" list="panel-list" />
-                <datalist id="panel-list">
-                    <select id="panel_name">
-                        
-                        {% for panel in panels %}
-                        <option value="{{panel}}">{{panel}}</option>
-                        {% endfor %}
-                        
-                    </select>
-                </datalist>
+                <input required type="text" name="panel_name" />
             </div>
         {% endif %}
         

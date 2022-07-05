@@ -9,21 +9,20 @@
     <form method="POST" action="">
         {% csrf_token %}
         <div class="form__group">
-            <label for="slot_list">Choose Interview Date: </label>
-            <input required type="text" name="date_0" list="slot-list" />
-            <datalist id="slot-list">
-                <select id="slot">
-                    
-                    {% for item in slots_for_id %}
-                    {% comment %} Checking if the slot is empty {% endcomment %}
-                    {% if item.booked == False %}
-                    <option value="{{item.id}}">{{item.date.year}}/{{item.date.month}}/{{item.date.day}}->{{item.time}}</option>
-                    {% endif %}
-                    
-                    {% endfor %}
-                    
-                </select>
-            </datalist>
+            <label for="slots">Choose Interview Date: </label>
+            
+            <select name="slot">
+                
+                {% for item in slots_for_id %}
+                {% comment %} Checking if the slot is empty {% endcomment %}
+                {% if item.booked == False %}
+                <option value="{{item.id}}">{{item.date.day}}/{{item.date.month}}/{{item.date.year}}->{{item.time}}</option>
+              
+                {% endif %}
+                
+                {% endfor %}
+                
+            </select>
         </div>
     
         <button type="submit" value="Submit">Submit</button>

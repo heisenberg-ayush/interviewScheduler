@@ -1,5 +1,4 @@
-# from datetime import datetime
-# from django.http import HttpResponse
+from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -109,17 +108,33 @@ def createPanel(request, pk):
             return redirect('panel-home')
         
         form = RoomForm()
-        panels = PanelRoom.objects.all()
         members = PanelMember.objects.all()
         
         if request.method == 'POST':
+            
+            #Creating Panel Room (without member n slots)
+            name = request.POST.get('panel_name')+ str(request.user)
+            # check if already exists
+            nam1 = PanelMember.objects.get(panel_name=name)
+            i=1
+            if nam1:
+                PanelRoom.objects.create(
+                    host=request.user,
+                    name=name+str(i),
+                )
+            else:
+                PanelRoom.objects.create(
+                    host=request.user,
+                    name=name,
+                )
+            i=i+1
             
             #Creating Interview Slot
             date_instance = request.POST.get('set_time_0')
             time_instance = request.POST.get('set_time_1')
             name_instance = request.POST.get('panel_name')
             i = " :: "
-            slot_name = name_instance + i + time_instance + i + date_instance 
+            slot_name = name_instance + i + time_instance + i + date_instance
             
             InterviewSlot.objects.create(
                 date=request.POST.get('set_time_0'),
@@ -129,24 +144,20 @@ def createPanel(request, pk):
             
             #Creating Panel member
             panel_member=request.POST.get('panel_member')
-            PanelMember.objects.create(
-                member_name=panel_member
-            )
+            # check if already exists
+            mem1 = PanelMember.objects.get(member_name=panel_member)
+            if mem1:
+                pass
+            else:
+                PanelMember.objects.create(
+                    member_name=panel_member
+                )
             
-            #Creating Panel Room (without member n slots)
-            PanelRoom.objects.create(
-                host=request.user,
-                name=request.POST.get('panel_name'),
-            )
-            
-            #Adding Panel member
-            panel = PanelRoom.objects.filter(name=request.POST.get('panel_name'))
-            if panel:
-                panel = panel[0]
-            member1 = PanelMember.objects.filter(member_name=panel_member)
-            if member1: 
-                mem = member1[0]
-            panel.panel_members.add(mem)
+            #Adding Panel member in the panel
+            panel = PanelRoom.objects.get(name=name)
+    
+            member1 = PanelMember.objects.get(member_name=panel_member)
+            panel.panel_members.add(member1)
             
             #Adding Panel interview Slot
             slot = InterviewSlot.objects.filter(slot=slot_name)
@@ -157,7 +168,7 @@ def createPanel(request, pk):
     else:
         return redirect('student-home')
         
-    context = {'form': form, 'panels': panels, 'members': members}
+    context = {'form': form, 'members': members}
     return render(request, 'base/panel_form.html', context)
 
 @login_required(login_url='login')
@@ -238,23 +249,27 @@ def addMembers(request, pk):
         
         if request.user != panel.host:
             return redirect('panel-home')
-        
-        members = PanelMember.objects.all()
-        
+                
         if request.method == 'POST':
             form = PanelForm(request.POST)
+            
             member__name = request.POST.get('member_name')
         
             if form.is_valid():
                 member_name = form.save(commit=False)
                 member_name = member__name
-
-                PanelMember.objects.create(
-                member_name=member_name,
-                email = request.POST.get('email'),
-                phone = request.POST.get('phone'),
-                branch = request.POST.get('branch'),
-            )                
+                
+                # check if already exists
+                member1 = PanelMember.objects.filter(member_name=member__name)
+                if member1:
+                    HttpResponse("<html><body>Member Already Exists!</body></html>")
+                else:
+                    PanelMember.objects.create(
+                    member_name=member_name,
+                    email = request.POST.get('email'),
+                    phone = request.POST.get('phone'),
+                    branch = request.POST.get('branch'),
+                )  
                 member1 = PanelMember.objects.get(member_name=member__name)
                 
                 panel.panel_members.add(member1)
@@ -262,8 +277,33 @@ def addMembers(request, pk):
     else:
         return redirect('student-home')
         
-    context = {'form': form, 'panel': panel, 'members': members}
+    context = {'form': form, 'panel': panel}
     return render(request, 'base/member_form.html', context)
+
+@login_required(login_url='login')
+def addExistingMembers(request, pk):
+    if request.user.is_teacher:
+        form = PanelForm()
+        panel = PanelRoom.objects.get(id=pk)
+        
+        if request.user != panel.host:
+            return redirect('panel-home')
+        
+        members = PanelMember.objects.all()
+        
+        if request.method == 'POST':
+            form = PanelForm(request.POST)
+            
+            member__name1 = request.POST.get('member_name1')
+            m1 = PanelMember.objects.get(member_name=member__name1)
+            
+            panel.panel_members.add(m1)
+            return redirect('panel-show', pk=request.user.id)
+    else:
+        return redirect('student-home')
+        
+    context = {'form': form, 'panel': panel, 'members': members}
+    return render(request, 'base/member_existing_form.html', context)
 
 @login_required(login_url='login')
 def updateMember(request, host, pk):
@@ -482,8 +522,9 @@ def joinPanel(request, pk):
         slots_for_id = InterviewSlot.objects.order_by('date').distinct()
         
         if request.method == 'POST':
-            sk = InterviewSlot.objects.get(id=request.POST.get('date_0'))
 
+            sk = InterviewSlot.objects.get(id=request.POST.get('slot'))
+            
             # Setting the value to True so that
             # this slot cannot be booked again
             sk.booked = True
@@ -504,7 +545,7 @@ def joinPanel(request, pk):
             nm = str(participant.member_name)
             send_mail(
                 'ISTE Interview Scheduled', # subject
-                'Interview scheduled for ' + nm + ' at ' + str(sk), # message
+                'Interview scheduled for ' + nm.upper() + ' at ' + str(sk.time) + ' on ' + str(sk.date), # message
                 settings.EMAIL_HOST_USER, # from email
                 [participant.email], # to email
             )
@@ -529,21 +570,3 @@ def sendEmail(request, pk):
     
     context = {}
     return render(request, 'base/sendEmail.html', context)
-
-# @login_required(login_url='login')
-# def bookSlot(request, date, pk):
-#     if request.user.is_student:
-#         participant = ParticipantDetail.objects.get(id=pk)
-#         user = User.objects.get(id=pk)
-#         if request.user != user:
-#             return redirect('student-home')
-        
-#         panel = PanelRoom.objects.filter(set_time__date__icontains=date)
-
-#         if request.method == 'POST':
-#             return redirect('student-home')
-#     else:
-#         return redirect('panel-home')
-    
-#     context = {'participant':participant, 'panel':panel}
-#     return render(request, 'base/bookForm.html', context)
